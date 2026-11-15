@@ -11,7 +11,7 @@ You can use Pops without creating an account. When you first open the app, it is
 ## Information We Collect
 
 - **Learning progress and settings:** what you have learned, your answers, your streak and daily goal, and the choices you make in the app, such as your native language and level.
-- **Usage and diagnostics:** how the app is used, including recordings of in-app activity, crash and error reports, and basic device information such as the device model, iOS version and app version.
+- **Usage and diagnostics:** how the app is used, including recordings of in-app activity, crash and error reports, basic device information such as the device model, iOS version and app version, and your approximate location (country and city), derived from your IP address.
 
 This information is linked only to your random ID. Some settings and cached content are stored only on your device.
 
