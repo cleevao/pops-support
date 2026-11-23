@@ -56,13 +56,23 @@
         background: rgba(255,255,255,.16); font-size: 15px; line-height: 1.45;
       }
       .note strong { font-weight: 700; }
+      .note.flash { animation: flash .6s ease 2; }
+      @keyframes flash { 50% { background: rgba(255,255,255,.34); } }
       .hidden { display: none; }
+      /* Arrow to Instagram's ⋯ menu, top right */
+      .pointer {
+        position: fixed; top: calc(8px + env(safe-area-inset-top)); right: 14px;
+        font-size: 34px; line-height: 1; animation: nudge 1.2s ease-in-out infinite;
+      }
+      @keyframes nudge { 50% { transform: translate(4px, -6px); } }
+      @media (prefers-reduced-motion: reduce) { .pointer, .note.flash { animation: none; } }
     </style>
   </head>
   <body>
     <div class="bubble b1"></div>
     <div class="bubble b2"></div>
     <div class="bubble b3"></div>
+    <div class="pointer hidden" id="pointer" aria-hidden="true">↗</div>
 
     <main>
       <img class="icon" src="../assets/Icon.png" alt="Pops" width="112" height="112" />
@@ -74,6 +84,7 @@
       </a>
       <br /><a class="alt hidden" id="alt" href="https://apps.apple.com/app/id6819862034">Open the App Store page</a>
 
+      <p class="note hidden" id="inApp"></p>
       <p class="note hidden" id="android"></p>
     </main>
 
@@ -111,6 +122,7 @@
             tagline: "Learn German and English with pictures",
             store: "Download on the App Store",
             alt: "Open the App Store page",
+            inApp: "Instagram can't open the App Store. Tap <strong>⋯</strong> at the top right, choose <strong>Open in external browser</strong>, then tap the button.",
             android: "Pops is <strong>iPhone only</strong> for now."
           },
           tr: {
@@ -118,6 +130,7 @@
             tagline: "Resimlerle Almanca ve İngilizce öğren",
             store: "App Store'dan indir",
             alt: "App Store sayfasını aç",
+            inApp: "Instagram App Store'u açamıyor. Sağ üstteki <strong>⋯</strong> simgesine dokun, <strong>Harici tarayıcıda aç</strong>'ı seç, sonra butona bas.",
             android: "Pops şimdilik <strong>sadece iPhone</strong>'da."
           },
           de: {
@@ -125,6 +138,7 @@
             tagline: "Deutsch und Englisch lernen mit Bildern",
             store: "Im App Store laden",
             alt: "App-Store-Seite öffnen",
+            inApp: "Instagram kann den App Store nicht öffnen. Tippe oben rechts auf <strong>⋯</strong>, wähle <strong>Im externen Browser öffnen</strong> und tippe dann auf den Button.",
             android: "Pops gibt es vorerst <strong>nur fürs iPhone</strong>."
           }
         };
@@ -145,6 +159,7 @@
         $("badge").src = "../assets/badges/app-store-" + t.badge + ".svg";
         $("badge").alt = t.store;
         $("alt").textContent = t.alt;
+        $("inApp").innerHTML = t.inApp;
         $("android").innerHTML = t.android;
 
         var store = $("store");
@@ -180,10 +195,13 @@
 
         // In an in-app browser (Instagram, Facebook, …) App Store links open the app's own
         // store sheet, which fails ("Cannot Connect to iTunes Store"). So the badge hands the
-        // App Store page to Safari instead (x-safari-https, iOS 17+).
+        // App Store page to Safari instead (x-safari-https, iOS 17+). Instagram blocks
+        // that too (2026-11-23), so the note (⋯ → open in external browser) shows from the start.
         if (inApp) {
           store.href = "x-safari-" + HTTPS;
           $("alt").classList.add("hidden");
+          $("inApp").classList.remove("hidden");
+          $("pointer").classList.remove("hidden");
         }
 
         store.addEventListener("click", function () {
@@ -201,7 +219,12 @@
             window.removeEventListener("pagehide", onHide);
             if (left) return;
             track("landing_store_failed", { method: method });
-          }, 2000);
+            var note = $("inApp");
+            note.classList.remove("hidden", "flash");
+            void note.offsetWidth;
+            note.classList.add("flash");
+            $("pointer").classList.remove("hidden");
+          }, 1500);
         });
       })();
     </script>
