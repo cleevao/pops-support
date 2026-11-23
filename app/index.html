@@ -193,26 +193,43 @@
         store.href = NATIVE;
         $("alt").classList.remove("hidden");
 
+        // In an in-app browser (Instagram, Facebook, …) App Store links open the app's own
+        // store sheet, which fails ("Cannot Connect to iTunes Store"). So the badge hands the
+        // App Store page to Safari instead (x-safari-https, iOS 17+); Instagram's own
+        // "open in external browser" link is tried next; the note is the last resort.
         if (inApp) {
-          $("inApp").classList.remove("hidden");
-          $("pointer").classList.remove("hidden");
+          store.href = "x-safari-" + HTTPS;
+          $("alt").classList.add("hidden");
         }
 
         store.addEventListener("click", function () {
+          var method = inApp ? "x-safari" : "itms-apps";
           var left = false;
-          var onHide = function () { if (document.hidden) left = true; };
+          var onHide = function () {
+            if (!document.hidden || left) return;
+            left = true;
+            track("landing_store_opened", { method: method });
+          };
           document.addEventListener("visibilitychange", onHide);
-          window.addEventListener("pagehide", function () { left = true; }, { once: true });
+          window.addEventListener("pagehide", onHide);
+          if (/Instagram/i.test(ua)) {
+            setTimeout(function () {
+              if (left) return;
+              method = "instagram-extbrowser";
+              location.href = "instagram://extbrowser/?url=" + encodeURIComponent(HTTPS);
+            }, 1500);
+          }
           setTimeout(function () {
             document.removeEventListener("visibilitychange", onHide);
+            window.removeEventListener("pagehide", onHide);
             if (left) return;
-            track("landing_store_failed");
+            track("landing_store_failed", { method: method });
             var note = $("inApp");
             note.classList.remove("hidden", "flash");
             void note.offsetWidth;
             note.classList.add("flash");
             $("pointer").classList.remove("hidden");
-          }, 2000);
+          }, inApp ? 3500 : 2000);
         });
       })();
     </script>
