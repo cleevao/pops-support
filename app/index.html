@@ -95,6 +95,16 @@
         var PH_URL = "https://us.i.posthog.com/i/v0/e/";
         var visitId = "landing-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
         var base = {};
+
+        // The owner's own devices: open the page once with ?owner=1 (per browser: Safari and
+        // Instagram's browser each once) and every later visit there carries is_owner: true.
+        // ?owner=0 removes the mark.
+        var isOwner = false;
+        try {
+          if (params.get("owner") === "1") localStorage.setItem("pops_owner", "1");
+          if (params.get("owner") === "0") localStorage.removeItem("pops_owner");
+          isOwner = localStorage.getItem("pops_owner") === "1";
+        } catch (e) {}
         function track(event, extra) {
           var props = { $process_person_profile: false, $lib: "pops-landing", $current_url: location.href, $referrer: document.referrer || "$direct" };
           for (var k in base) props[k] = base[k];
@@ -155,6 +165,7 @@
           : /musical_ly|BytedanceWebview|TikTok/i.test(ua) ? "tiktok" : inApp ? "other" : "none";
         base = {
           src: SRC,
+          is_owner: isOwner,
           device_language: navigator.language || "",
           device_languages: (navigator.languages || []).join(","),
           page_language: lang,
@@ -209,7 +220,7 @@
             window.removeEventListener("pagehide", onHide);
             if (left) return;
             track("landing_store_failed", { method: method });
-          }, inApp ? 3500 : 2000);
+          }, inApp ? 8000 : 3000);
         });
       })();
     </script>
