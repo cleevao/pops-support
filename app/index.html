@@ -91,8 +91,30 @@
     <script>
       (function () {
         var APP_ID = "6819862034";
-        var HTTPS = "https://apps.apple.com/app/id" + APP_ID;
-        var NATIVE = "itms-apps://apps.apple.com/app/id" + APP_ID;
+        // App Store Connect campaign link: set PT (provider token, App Store Connect →
+        // Analytics → Acquisition → Campaigns) to see visits and downloads per campaign there.
+        var PT = "";
+        var params = new URLSearchParams(location.search);
+        var SRC = (params.get("src") || "instagram").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "instagram";
+        var CAMPAIGN = PT ? "?pt=" + PT + "&ct=" + SRC + "&mt=8" : "";
+        var HTTPS = "https://apps.apple.com/app/id" + APP_ID + CAMPAIGN;
+        var NATIVE = "itms-apps://apps.apple.com/app/id" + APP_ID + CAMPAIGN;
+
+        // Counting: PostHog's public project key (write-only, made to be public).
+        // No cookies, no storage: a random id per page load, no person profiles.
+        var PH_KEY = "phc_xmx64T6gJRhp4B3bFgfhVQsqgB6bBWZyZnf2jtSmJ4QK";
+        var PH_URL = "https://us.i.posthog.com/i/v0/e/";
+        var visitId = "landing-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        var base = {};
+        function track(event, extra) {
+          var props = { $process_person_profile: false, $lib: "pops-landing", $current_url: location.href, $referrer: document.referrer || "$direct" };
+          for (var k in base) props[k] = base[k];
+          for (var k2 in extra || {}) props[k2] = extra[k2];
+          var body = JSON.stringify({ api_key: PH_KEY, event: event, distinct_id: visitId, properties: props });
+          try {
+            fetch(PH_URL, { method: "POST", body: body, keepalive: true, headers: { "Content-Type": "text/plain" } }).catch(function () {});
+          } catch (e) {}
+        }
 
         var T = {
           en: {
@@ -141,6 +163,23 @@
         $("android").innerHTML = t.android;
 
         var store = $("store");
+        store.href = HTTPS;
+        $("alt").href = HTTPS;
+
+        var inAppName = /Instagram/i.test(ua) ? "instagram" : /FBAN|FBAV|FB_IAB|FBIOS/i.test(ua) ? "facebook"
+          : /musical_ly|BytedanceWebview|TikTok/i.test(ua) ? "tiktok" : inApp ? "other" : "none";
+        base = {
+          src: SRC,
+          device_language: navigator.language || "",
+          device_languages: (navigator.languages || []).join(","),
+          page_language: lang,
+          platform: isIOS ? "ios" : isAndroid ? "android" : "desktop",
+          in_app_browser: inAppName,
+          screen_width: window.screen && screen.width
+        };
+        track("landing_view");
+        store.addEventListener("click", function () { track("landing_store_tap", { button: "badge" }); });
+        $("alt").addEventListener("click", function () { track("landing_store_tap", { button: "link" }); });
 
         if (isAndroid) {
           $("android").classList.remove("hidden");
@@ -167,6 +206,7 @@
           setTimeout(function () {
             document.removeEventListener("visibilitychange", onHide);
             if (left) return;
+            track("landing_store_failed");
             var note = $("inApp");
             note.classList.remove("hidden", "flash");
             void note.offsetWidth;
