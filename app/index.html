@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Pops – Download</title>
+    <meta name="description" content="Pops: learn German and English with pictures. Download on the App Store." />
+    <meta name="apple-itunes-app" content="app-id=6819862034" />
+    <meta property="og:title" content="Pops: English & German" />
+    <meta property="og:description" content="Learn German and English with pictures." />
+    <meta property="og:image" content="https://cleevao.github.io/pops-support/assets/Icon.png" />
+    <meta property="og:url" content="https://cleevao.github.io/pops-support/app/" />
+    <meta name="theme-color" content="#934a5b" />
+    <link rel="icon" href="../assets/Icon.png" />
+    <link rel="apple-touch-icon" href="../assets/Icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --rose: #b0647a;
+        --rose-deep: #7c384b;
+        --ink: #2a1a20;
+        --white: #ffffff;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { height: 100%; }
+      body {
+        font-family: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: var(--white);
+        background: linear-gradient(160deg, var(--rose) 0%, var(--rose-deep) 100%);
+        background-color: var(--rose-deep);
+        min-height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 32px 16px calc(32px + env(safe-area-inset-bottom));
+        text-align: center;
+        overflow-x: hidden;
+      }
+      .bubble { position: fixed; border-radius: 50%; background: rgba(255,255,255,.10); pointer-events: none; }
+      .b1 { width: 180px; height: 180px; top: -60px; left: -50px; }
+      .b2 { width: 110px; height: 110px; bottom: 12%; right: -30px; }
+      .b3 { width: 60px; height: 60px; top: 22%; right: 14%; }
+      main { position: relative; width: 100%; max-width: 380px; }
+      .icon { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 12px 32px rgba(0,0,0,.25); }
+      h1 { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 48px; line-height: 1; margin: 22px 0 10px; }
+      .tagline { font-size: 18px; opacity: .95; margin-bottom: 32px; }
+      .store {
+        display: flex; align-items: center; justify-content: center; gap: 12px;
+        width: 100%; padding: 16px 24px; border-radius: 999px;
+        background: var(--white); color: var(--rose-deep);
+        font-weight: 700; font-size: 19px; text-decoration: none;
+        box-shadow: 0 8px 20px rgba(0,0,0,.18);
+        transition: transform .15s;
+      }
+      .store:active { transform: scale(.96); }
+      .store svg { width: 24px; height: 24px; flex-shrink: 0; }
+      .alt { display: inline-block; margin-top: 16px; color: var(--white); opacity: .85; font-size: 15px; }
+      .note {
+        margin-top: 28px; padding: 16px 18px; border-radius: 18px;
+        background: rgba(255,255,255,.16); font-size: 15px; line-height: 1.45;
+      }
+      .note strong { font-weight: 700; }
+      .note.flash { animation: flash .6s ease 2; }
+      @keyframes flash { 50% { background: rgba(255,255,255,.34); } }
+      .hidden { display: none; }
+      /* Arrow to Instagram's ⋯ menu, top right */
+      .pointer {
+        position: fixed; top: calc(8px + env(safe-area-inset-top)); right: 14px;
+        font-size: 34px; line-height: 1; animation: nudge 1.2s ease-in-out infinite;
+      }
+      @keyframes nudge { 50% { transform: translate(4px, -6px); } }
+      @media (prefers-reduced-motion: reduce) { .pointer, .note.flash { animation: none; } }
+    </style>
+  </head>
+  <body>
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+    <div class="pointer hidden" id="pointer" aria-hidden="true">↗</div>
+
+    <main>
+      <img class="icon" src="../assets/Icon.png" alt="Pops" width="112" height="112" />
+      <h1>Pops!</h1>
+      <p class="tagline" id="tagline">Learn German and English with pictures</p>
+
+      <a class="store" id="store" href="https://apps.apple.com/app/id6819862034">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10.5 12 15.5 17 10.5"/><path d="M5 20h14"/></svg>
+        <span id="storeLabel">Download on the App Store</span>
+      </a>
+      <a class="alt hidden" id="alt" href="https://apps.apple.com/app/id6819862034">Open the App Store page</a>
+
+      <p class="note hidden" id="inApp"></p>
+      <p class="note hidden" id="android"></p>
+    </main>
+
+    <script>
+      (function () {
+        var APP_ID = "6819862034";
+        var HTTPS = "https://apps.apple.com/app/id" + APP_ID;
+        var NATIVE = "itms-apps://apps.apple.com/app/id" + APP_ID;
+
+        var T = {
+          en: {
+            tagline: "Learn German and English with pictures",
+            store: "Download on the App Store",
+            alt: "Open the App Store page",
+            inApp: "Nothing happened? Tap <strong>⋯</strong> at the top right and choose <strong>Open in external browser</strong>, then tap the button again.",
+            android: "Pops is <strong>iPhone only</strong> for now."
+          },
+          tr: {
+            tagline: "Resimlerle Almanca ve İngilizce öğren",
+            store: "App Store'dan indir",
+            alt: "App Store sayfasını aç",
+            inApp: "Bir şey olmadı mı? Sağ üstteki <strong>⋯</strong> simgesine dokun, <strong>Harici tarayıcıda aç</strong>'ı seç, sonra butona tekrar bas.",
+            android: "Pops şimdilik <strong>sadece iPhone</strong>'da."
+          },
+          de: {
+            tagline: "Deutsch und Englisch lernen mit Bildern",
+            store: "Im App Store laden",
+            alt: "App-Store-Seite öffnen",
+            inApp: "Nichts passiert? Tippe oben rechts auf <strong>⋯</strong> und wähle <strong>Im externen Browser öffnen</strong>, dann tippe noch einmal auf den Button.",
+            android: "Pops gibt es vorerst <strong>nur fürs iPhone</strong>."
+          }
+        };
+
+        var langs = (navigator.languages || [navigator.language || "en"]).map(function (l) { return String(l).slice(0, 2).toLowerCase(); });
+        var lang = "en";
+        for (var i = 0; i < langs.length; i++) { if (T[langs[i]]) { lang = langs[i]; break; } }
+        var t = T[lang];
+        document.documentElement.lang = lang;
+
+        var ua = navigator.userAgent || "";
+        var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+        var isAndroid = /Android/i.test(ua);
+        var inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|musical_ly|BytedanceWebview|TikTok|Snapchat|LinkedInApp|Line\//i.test(ua);
+
+        var $ = function (id) { return document.getElementById(id); };
+        $("tagline").textContent = t.tagline;
+        $("storeLabel").textContent = t.store;
+        $("alt").textContent = t.alt;
+        $("inApp").innerHTML = t.inApp;
+        $("android").innerHTML = t.android;
+
+        var store = $("store");
+
+        if (isAndroid) {
+          $("android").classList.remove("hidden");
+          store.classList.add("hidden");
+          return;
+        }
+
+        if (!isIOS) return; // desktop: plain https link
+
+        // iPhone: the App Store app's own scheme gets past in-app browsers more often than https.
+        store.href = NATIVE;
+        $("alt").classList.remove("hidden");
+
+        if (inApp) {
+          $("inApp").classList.remove("hidden");
+          $("pointer").classList.remove("hidden");
+        }
+
+        store.addEventListener("click", function () {
+          var left = false;
+          var onHide = function () { if (document.hidden) left = true; };
+          document.addEventListener("visibilitychange", onHide);
+          window.addEventListener("pagehide", function () { left = true; }, { once: true });
+          setTimeout(function () {
+            document.removeEventListener("visibilitychange", onHide);
+            if (left) return;
+            var note = $("inApp");
+            note.classList.remove("hidden", "flash");
+            void note.offsetWidth;
+            note.classList.add("flash");
+            $("pointer").classList.remove("hidden");
+          }, 2000);
+        });
+      })();
+    </script>
+  </body>
