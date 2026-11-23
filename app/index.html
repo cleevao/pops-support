@@ -47,16 +47,9 @@
       .icon { width: 112px; height: 112px; border-radius: 26px; box-shadow: 0 12px 32px rgba(0,0,0,.25); }
       h1 { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 48px; line-height: 1; margin: 22px 0 10px; }
       .tagline { font-size: 18px; opacity: .95; margin-bottom: 32px; }
-      .store {
-        display: flex; align-items: center; justify-content: center; gap: 12px;
-        width: 100%; padding: 16px 24px; border-radius: 999px;
-        background: var(--white); color: var(--rose-deep);
-        font-weight: 700; font-size: 19px; text-decoration: none;
-        box-shadow: 0 8px 20px rgba(0,0,0,.18);
-        transition: transform .15s;
-      }
+      .store { display: inline-block; border-radius: 14px; transition: transform .15s; -webkit-tap-highlight-color: transparent; }
       .store:active { transform: scale(.96); }
-      .store svg { width: 24px; height: 24px; flex-shrink: 0; }
+      .store img { display: block; height: 64px; width: auto; filter: drop-shadow(0 8px 18px rgba(0,0,0,.22)); }
       .alt { display: inline-block; margin-top: 16px; color: var(--white); opacity: .85; font-size: 15px; }
       .note {
         margin-top: 28px; padding: 16px 18px; border-radius: 18px;
@@ -87,10 +80,9 @@
       <p class="tagline" id="tagline">Learn German and English with pictures</p>
 
       <a class="store" id="store" href="https://apps.apple.com/app/id6819862034">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4v11"/><path d="M7 10.5 12 15.5 17 10.5"/><path d="M5 20h14"/></svg>
-        <span id="storeLabel">Download on the App Store</span>
+        <img id="badge" src="../assets/badges/app-store-en-us.svg" alt="Download on the App Store" height="64" />
       </a>
-      <a class="alt hidden" id="alt" href="https://apps.apple.com/app/id6819862034">Open the App Store page</a>
+      <br /><a class="alt hidden" id="alt" href="https://apps.apple.com/app/id6819862034">Open the App Store page</a>
 
       <p class="note hidden" id="inApp"></p>
       <p class="note hidden" id="android"></p>
@@ -104,6 +96,7 @@
 
         var T = {
           en: {
+            badge: "en-us",
             tagline: "Learn German and English with pictures",
             store: "Download on the App Store",
             alt: "Open the App Store page",
@@ -111,6 +104,7 @@
             android: "Pops is <strong>iPhone only</strong> for now."
           },
           tr: {
+            badge: "tr-tr",
             tagline: "Resimlerle Almanca ve İngilizce öğren",
             store: "App Store'dan indir",
             alt: "App Store sayfasını aç",
@@ -118,6 +112,7 @@
             android: "Pops şimdilik <strong>sadece iPhone</strong>'da."
           },
           de: {
+            badge: "de-de",
             tagline: "Deutsch und Englisch lernen mit Bildern",
             store: "Im App Store laden",
             alt: "App-Store-Seite öffnen",
@@ -139,7 +134,8 @@
 
         var $ = function (id) { return document.getElementById(id); };
         $("tagline").textContent = t.tagline;
-        $("storeLabel").textContent = t.store;
+        $("badge").src = "../assets/badges/app-store-" + t.badge + ".svg";
+        $("badge").alt = t.store;
         $("alt").textContent = t.alt;
         $("inApp").innerHTML = t.inApp;
         $("android").innerHTML = t.android;
