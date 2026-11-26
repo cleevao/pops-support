@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <title>Pops – Download</title>
+    <meta name="description" content="Pops: learn German and English with pictures. Search “Pops” on the App Store." />
+    <meta name="apple-itunes-app" content="app-id=6819862034" />
+    <meta property="og:title" content="Pops: English & German" />
+    <meta property="og:description" content="Learn German and English with pictures." />
+    <meta property="og:image" content="https://cleevao.github.io/pops-support/assets/Icon.png" />
+    <meta property="og:url" content="https://cleevao.github.io/pops-support/tiktok/" />
+    <meta name="theme-color" content="#934a5b" />
+    <link rel="icon" href="../assets/Icon.png" />
+    <link rel="apple-touch-icon" href="../assets/Icon.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@600&family=Nunito+Sans:wght@400;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --rose: #b0647a;
+        --rose-deep: #7c384b;
+        --white: #ffffff;
+      }
+      * { margin: 0; padding: 0; box-sizing: border-box; }
+      html, body { min-height: 100%; }
+      body {
+        font-family: "Nunito Sans", -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        color: var(--white);
+        background: linear-gradient(160deg, var(--rose) 0%, var(--rose-deep) 100%);
+        background-color: var(--rose-deep);
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        padding: 28px 16px calc(28px + env(safe-area-inset-bottom));
+        text-align: center;
+        overflow-x: hidden;
+      }
+      .bubble { position: fixed; border-radius: 50%; background: rgba(255,255,255,.10); pointer-events: none; }
+      .b1 { width: 180px; height: 180px; top: -60px; left: -50px; }
+      .b2 { width: 110px; height: 110px; bottom: 12%; right: -30px; }
+      .b3 { width: 60px; height: 60px; top: 22%; right: 14%; }
+      main { position: relative; width: 100%; max-width: 380px; }
+      .head { display: flex; align-items: center; justify-content: center; gap: 14px; }
+      .icon { width: 72px; height: 72px; border-radius: 17px; box-shadow: 0 10px 26px rgba(0,0,0,.25); }
+      h1 { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 44px; line-height: 1; }
+      .tagline { font-size: 17px; opacity: .95; margin: 12px 0 18px; }
+      .howto { font-family: "Fredoka", sans-serif; font-weight: 600; font-size: 22px; line-height: 1.2; margin-bottom: 14px; }
+      .video {
+        display: block; margin: 0 auto;
+        width: min(100%, 300px, calc((100vh - 290px) * 0.794));
+        aspect-ratio: 720 / 906;
+        border-radius: 24px; overflow: hidden;
+        background: #f6eeee;
+        box-shadow: 0 14px 34px rgba(0,0,0,.25);
+      }
+      .video video { display: block; width: 100%; height: 100%; object-fit: cover; }
+      .alt { display: inline-block; margin-top: 16px; color: var(--white); opacity: .85; font-size: 15px; }
+      .note { margin-top: 18px; padding: 14px 16px; border-radius: 18px; background: rgba(255,255,255,.16); font-size: 15px; line-height: 1.45; }
+      .hidden { display: none; }
+    </style>
+  </head>
+  <body>
+    <div class="bubble b1"></div>
+    <div class="bubble b2"></div>
+    <div class="bubble b3"></div>
+
+    <main>
+      <div class="head">
+        <img class="icon" src="../assets/Icon.png" alt="Pops" width="72" height="72" />
+        <h1>Pops!</h1>
+      </div>
+      <p class="tagline" id="tagline">Learn German and English with pictures</p>
+
+      <p class="howto" id="howto">Open the App Store and search “Pops”</p>
+      <div class="video">
+        <video id="video" autoplay muted loop playsinline preload="auto" poster="search_en.jpg" aria-label="Searching Pops on the App Store">
+          <source id="videoSrc" src="search_en.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      <a class="alt hidden" id="alt" href="https://apps.apple.com/app/id6819862034">Open the App Store page</a>
+      <p class="note hidden" id="android"></p>
+    </main>
+
+    <script>
+      (function () {
+        // The TikTok bio page: TikTok's in-app browser lets no link reach the App Store
+        // (x-safari, itms-apps and https all fail), so instead of a button this page shows
+        // how to find Pops by searching the App Store. The Instagram page is ../app/.
+        var APP_ID = "6819862034";
+        var params = new URLSearchParams(location.search);
+        var SRC = (params.get("src") || "tiktok").replace(/[^a-z0-9_-]/gi, "").slice(0, 40) || "tiktok";
+        var HTTPS = "https://apps.apple.com/app/id" + APP_ID;
+
+        // Counting: PostHog's public project key (write-only, made to be public).
+        // No cookies: a random id per page load, no person profiles.
+        var PH_KEY = "phc_xmx64T6gJRhp4B3bFgfhVQsqgB6bBWZyZnf2jtSmJ4QK";
+        var PH_URL = "https://us.i.posthog.com/i/v0/e/";
+        var visitId = "landing-" + Math.random().toString(36).slice(2) + Date.now().toString(36);
+        var base = {};
+
+        // The owner's own devices: open the page once with ?owner=1 (per browser) and every
+        // later visit there carries is_owner: true. ?owner=0 removes the mark.
+        var isOwner = false;
+        try {
+          if (params.get("owner") === "1") localStorage.setItem("pops_owner", "1");
+          if (params.get("owner") === "0") localStorage.removeItem("pops_owner");
+          isOwner = localStorage.getItem("pops_owner") === "1";
+        } catch (e) {}
+        function track(event, extra) {
+          var props = { $process_person_profile: false, $lib: "pops-landing", $current_url: location.href, $referrer: document.referrer || "$direct" };
+          for (var k in base) props[k] = base[k];
+          for (var k2 in extra || {}) props[k2] = extra[k2];
+          var body = JSON.stringify({ api_key: PH_KEY, event: event, distinct_id: visitId, properties: props });
+          try {
+            fetch(PH_URL, { method: "POST", body: body, keepalive: true, headers: { "Content-Type": "text/plain" } }).catch(function () {});
+          } catch (e) {}
+        }
+
+        // Videos exist in English and German; Turkish shows the English one (the search is "Pops" in both).
+        var T = {
+          en: {
+            video: "en",
+            tagline: "Learn German and English with pictures",
+            howto: "Open the App Store and search “Pops”",
+            alt: "Open the App Store page",
+            android: "Pops is <strong>iPhone only</strong> for now."
+          },
+          tr: {
+            video: "en",
+            tagline: "Resimlerle Almanca ve İngilizce öğren",
+            howto: "App Store'u aç ve “Pops” ara",
+            alt: "App Store sayfasını aç",
+            android: "Pops şimdilik <strong>sadece iPhone</strong>'da."
+          },
+          de: {
+            video: "de",
+            tagline: "Deutsch und Englisch lernen mit Bildern",
+            howto: "Öffne den App Store und suche „Pops“",
+            alt: "App-Store-Seite öffnen",
+            android: "Pops gibt es vorerst <strong>nur fürs iPhone</strong>."
+          }
+        };
+
+        var langs = (navigator.languages || [navigator.language || "en"]).map(function (l) { return String(l).slice(0, 2).toLowerCase(); });
+        var lang = "en";
+        for (var i = 0; i < langs.length; i++) { if (T[langs[i]]) { lang = langs[i]; break; } }
+        var t = T[lang];
+        document.documentElement.lang = lang;
+
+        var $ = function (id) { return document.getElementById(id); };
+        $("tagline").textContent = t.tagline;
+        $("howto").textContent = t.howto;
+        $("alt").textContent = t.alt;
+        $("alt").href = HTTPS;
+        $("android").innerHTML = t.android;
+        if (t.video !== "en") {
+          var video = $("video");
+          video.poster = "search_" + t.video + ".jpg";
+          $("videoSrc").src = "search_" + t.video + ".mp4";
+          video.load();
+          video.play && video.play().catch(function () {});
+        }
+
+        var ua = navigator.userAgent || "";
+        var isIOS = /iPhone|iPad|iPod/.test(ua) || (/Macintosh/.test(ua) && navigator.maxTouchPoints > 1);
+        var isAndroid = /Android/i.test(ua);
+        var inApp = /Instagram|FBAN|FBAV|FB_IAB|FBIOS|musical_ly|BytedanceWebview|TikTok|Snapchat|LinkedInApp|Line\//i.test(ua);
+        var inAppName = /Instagram/i.test(ua) ? "instagram" : /FBAN|FBAV|FB_IAB|FBIOS/i.test(ua) ? "facebook"
+          : /musical_ly|BytedanceWebview|TikTok/i.test(ua) ? "tiktok" : inApp ? "other" : "none";
+        base = {
+          src: SRC,
+          page: "tiktok",
+          is_owner: isOwner,
+          device_language: navigator.language || "",
+          device_languages: (navigator.languages || []).join(","),
+          page_language: lang,
+          platform: isIOS ? "ios" : isAndroid ? "android" : "desktop",
+          in_app_browser: inAppName,
+          screen_width: window.screen && screen.width
+        };
+        track("landing_view");
+
+        if (isAndroid) { $("android").classList.remove("hidden"); return; }
+
+        // Outside an in-app browser (Safari, desktop) the plain App Store link works too.
+        if (!inApp) {
+          $("alt").classList.remove("hidden");
+          $("alt").addEventListener("click", function () { track("landing_store_tap", { button: "link" }); });
+        }
+      })();
+    </script>
+  </body>
+</html>
